@@ -1,7 +1,7 @@
 {
   "name": "Math Levels",
   "short_name": "Math Levels",
-  "description": "Elementary maths practice with 12 levels of increasing difficulty.",
+  "description": "Elementary maths practice with 16 levels of increasing difficulty, from arithmetic to aptitude.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
