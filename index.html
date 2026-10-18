@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Math Levels" />
+<meta name="theme-color" content="#4f46e5" />
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="icon-192.png" />
+<title>Math Levels</title>
+<style>
+  :root{
+    --bg1:#eef2ff; --bg2:#faf5ff; --ink:#1e1b4b; --muted:#6b7280;
+    --brand:#4f46e5; --brand2:#7c3aed; --good:#16a34a; --bad:#dc2626;
+    --card:#ffffff; --line:#e5e7eb; --gold:#f59e0b;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    min-height:100vh; min-height:100dvh;
+    display:flex; justify-content:center;
+    padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
+    user-select:none;
+  }
+  #app{width:100%; max-width:520px; padding:18px 18px 28px; display:flex; flex-direction:column;}
+  .screen{display:none; flex:1; flex-direction:column; animation:fade .25s ease;}
+  .screen.active{display:flex;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+
+  header.top{display:flex; align-items:center; gap:12px; margin:6px 0 16px;}
+  header.top h1{font-size:24px; margin:0; letter-spacing:-.02em;}
+  .sub{color:var(--muted); font-size:13px; margin:2px 0 0;}
+
+  .levels{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .lvl{
+    position:relative; background:var(--card); border:1px solid var(--line);
+    border-radius:18px; padding:14px 8px 10px; text-align:center;
+    box-shadow:0 1px 2px rgba(30,27,75,.05); cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .lvl:active{transform:scale(.96);}
+  .lvl .num{font-size:22px; font-weight:800; line-height:1;}
+  .lvl .nm{font-size:11px; color:var(--muted); margin-top:5px; min-height:26px; line-height:1.25;}
+  .lvl .stars{font-size:12px; margin-top:4px; letter-spacing:1px; height:16px;}
+  .lvl.locked{opacity:.5; cursor:not-allowed; background:#f3f4f6;}
+  .lvl.locked:active{transform:none;}
+  .lvl .lock{position:absolute; top:8px; right:9px; font-size:13px; opacity:.6;}
+  .lvl .badge{position:absolute; top:-7px; left:-7px; background:var(--brand); color:#fff;
+    font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; box-shadow:0 2px 6px rgba(79,70,229,.4);}
+  .stars .on{color:var(--gold);} .stars .off{color:#d1d5db;}
+
+  .reset{align-self:center; margin-top:auto; padding-top:20px; color:var(--muted);
+    font-size:12px; background:none; border:none; text-decoration:underline; cursor:pointer;}
+
+  /* Quiz */
+  .quizbar{display:flex; align-items:center; gap:10px; margin:4px 0 8px;}
+  .back{background:none;border:none;font-size:22px;color:var(--brand);cursor:pointer;padding:4px 6px;}
+  .progwrap{flex:1; height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden;}
+  .progfill{height:100%; width:0; background:linear-gradient(90deg,var(--brand),var(--brand2)); transition:width .3s ease;}
+  .qcount{font-size:12px; color:var(--muted); min-width:44px; text-align:right;}
+
+  .qcard{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:26px 18px;
+    margin:10px 0; text-align:center; box-shadow:0 4px 16px rgba(30,27,75,.06); flex:0 0 auto;}
+  .qtitle{font-size:13px; color:var(--muted); margin-bottom:8px;}
+  .qprompt{font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1.2; word-break:break-word;}
+  .answerbox{font-size:40px; font-weight:800; min-height:52px; margin-top:12px;
+    border-bottom:3px solid var(--line); display:inline-block; min-width:120px; padding:0 10px;}
+  .answerbox.ok{border-color:var(--good); color:var(--good);}
+  .answerbox.no{border-color:var(--bad); color:var(--bad);}
+  .feedback{min-height:22px; margin-top:10px; font-weight:700; font-size:15px;}
+
+  .choices{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:6px 0 10px;}
+  .choice{padding:18px; font-size:22px; font-weight:700; background:var(--card);
+    border:1px solid var(--line); border-radius:16px; cursor:pointer; transition:transform .1s ease;}
+  .choice:active{transform:scale(.97);}
+  .choice.ok{background:#dcfce7; border-color:var(--good); color:var(--good);}
+  .choice.no{background:#fee2e2; border-color:var(--bad); color:var(--bad);}
+
+  .keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:auto;}
+  .key{padding:16px 0; font-size:24px; font-weight:700; background:var(--card);
+    border:1px solid var(--line); border-radius:16px; cursor:pointer; transition:transform .08s ease;}
+  .key:active{transform:scale(.95); background:#eef2ff;}
+  .key.wide{grid-column:span 1; font-size:18px;}
+  .key.go{background:var(--brand); color:#fff; border-color:var(--brand);}
+  .key.go:disabled{opacity:.4;}
+
+  /* Result */
+  .result{align-items:center; text-align:center; justify-content:center; gap:6px;}
+  .result .big{font-size:64px; font-weight:900; letter-spacing:-.03em;}
+  .result .rstars{font-size:44px; letter-spacing:6px; margin:6px 0;}
+  .result .msg{font-size:17px; font-weight:700; margin-top:6px;}
+  .result .detail{color:var(--muted); margin-top:4px; font-size:14px;}
+  .btnrow{display:flex; gap:12px; margin-top:26px; width:100%; max-width:340px;}
+  .btn{flex:1; padding:16px; border-radius:16px; font-size:17px; font-weight:700; border:none; cursor:pointer;}
+  .btn.primary{background:var(--brand); color:#fff;}
+  .btn.ghost{background:#fff; border:1px solid var(--line); color:var(--ink);}
+  .btn:active{transform:scale(.98);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- HOME -->
+  <section id="home" class="screen active">
+    <header class="top">
+      <div>
+        <h1>Math Levels</h1>
+        <p class="sub" id="homeSub">Pick a level and practise.</p>
+      </div>
+    </header>
+    <div class="levels" id="levelGrid"></div>
+    <button class="reset" id="resetBtn">Reset all progress</button>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz" class="screen">
+    <div class="quizbar">
+      <button class="back" id="backBtn" aria-label="Back">‹</button>
+      <div class="progwrap"><div class="progfill" id="progFill"></div></div>
+      <div class="qcount" id="qCount">1/10</div>
+    </div>
+    <div class="qcard">
+      <div class="qtitle" id="qTitle">Level</div>
+      <div class="qprompt" id="qPrompt">2 + 3</div>
+      <div class="answerbox" id="answerBox" style="display:none"></div>
+      <div class="feedback" id="feedback"></div>
+    </div>
+    <div class="choices" id="choices" style="display:none"></div>
+    <div class="keypad" id="keypad" style="display:none"></div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="result" class="screen result">
+    <div class="big" id="rScore">8/10</div>
+    <div class="rstars" id="rStars">★★★</div>
+    <div class="msg" id="rMsg">Great job!</div>
+    <div class="detail" id="rDetail"></div>
+    <div class="btnrow">
+      <button class="btn ghost" id="retryBtn">Try again</button>
+      <button class="btn primary" id="nextBtn">Next level</button>
+    </div>
+  </section>
+
+</div>
+
+<script>
+/* ---------- helpers ---------- */
+const rnd = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+const pick = (a) => a[Math.floor(Math.random() * a.length)];
+const gcd = (a, b) => (b ? gcd(b, a % b) : a);
+const shuffle = (a) => a.map(v => [Math.random(), v]).sort((x, y) => x[0] - y[0]).map(v => v[1]);
+const uniq = (arr) => arr.filter((v, i, s) => s.indexOf(v) === i);
+const money = (n) => String(n);
+
+/* Build 4 multiple-choice options: correct + 3 unique distractors. */
+function makeChoices(correct, distractors){
+  const pool = uniq([correct, ...distractors]).slice(0, 4);
+  let i = 0;
+  while (pool.length < 4){
+    const cand = correct + (++i) * (Math.random() < .5 ? 1 : -1) * rnd(1, 4);
+    if (cand !== correct && !pool.includes(String(cand))) pool.push(String(cand));
+  }
+  return shuffle(pool);
+}
+
+/* ---------- level generators (difficulty ramps 1 -> 12) ---------- */
+const LEVELS = [
+  { id:1, name:"Add to 10", icon:"➕", input:"keypad", gen(){
+      const a = rnd(1,5), b = rnd(1,5);
+      return { prompt:`${a} + ${b}`, answer:String(a+b) };
+  }},
+  { id:2, name:"Take away", icon:"➖", input:"keypad", gen(){
+      const a = rnd(3,10), b = rnd(1,a-1);
+      return { prompt:`${a} − ${b}`, answer:String(a-b) };
+  }},
+  { id:3, name:"Within 20", icon:"🔢", input:"keypad", gen(){
+      if (Math.random()<.5){ const a=rnd(4,12), b=rnd(2,20-a); return {prompt:`${a} + ${b}`, answer:String(a+b)}; }
+      const a=rnd(10,20), b=rnd(2,9); return {prompt:`${a} − ${b}`, answer:String(a-b)};
+  }},
+  { id:4, name:"Tables 1–5", icon:"✖️", input:"keypad", gen(){
+      const a=rnd(1,5), b=rnd(1,5); return { prompt:`${a} × ${b}`, answer:String(a*b) };
+  }},
+  { id:5, name:"Tables & ÷", icon:"➗", input:"keypad", gen(){
+      const a=rnd(2,10), b=rnd(2,10);
+      if (Math.random()<.5) return { prompt:`${a} × ${b}`, answer:String(a*b) };
+      return { prompt:`${a*b} ÷ ${b}`, answer:String(a) };
+  }},
+  { id:6, name:"Carry over", icon:"🧮", input:"keypad", gen(){
+      if (Math.random()<.5){ const a=rnd(15,89), b=rnd(15,89); return {prompt:`${a} + ${b}`, answer:String(a+b)}; }
+      const a=rnd(40,99), b=rnd(11,39); return {prompt:`${a} − ${b}`, answer:String(a-b)};
+  }},
+  { id:7, name:"Big × and ÷", icon:"🧠", input:"keypad", gen(){
+      if (Math.random()<.5){ const a=rnd(11,29), b=rnd(3,9); return {prompt:`${a} × ${b}`, answer:String(a*b)}; }
+      const b=rnd(3,9), q=rnd(11,40); return {prompt:`${b*q} ÷ ${b}`, answer:String(q)};
+  }},
+  { id:8, name:"Order of ops", icon:"📐", input:"keypad", gen(){
+      const a=rnd(2,9), b=rnd(2,9), c=rnd(2,9);
+      if (Math.random()<.5) return { prompt:`${a} + ${b} × ${c}`, answer:String(a + b*c) };
+      return { prompt:`(${a} + ${b}) × ${c}`, answer:String((a+b)*c) };
+  }},
+  { id:9, name:"Fractions", icon:"½", input:"choice", gen(){
+      const d = rnd(3,6);
+      let a = rnd(1,d-1), c = rnd(1,d-1);
+      if (a + c >= d) { a = Math.max(1, Math.floor(d/3)); c = Math.max(1, Math.floor(d/3)); }
+      const num = a + c;
+      const correct = `${num}/${d}`;
+      const distractors = [`${num}/${d+d}`, `${Math.abs(a-c)}/${d}`, `${num+1}/${d}`];
+      return { prompt:`${a}/${d} + ${c}/${d}`, answer:correct, choices:makeChoices(correct, distractors) };
+  }},
+  { id:10, name:"Decimals & %", icon:"💯", input:"keypad", gen(){
+      if (Math.random()<.5){
+          const a=rnd(1,9), b=rnd(1,9);
+          const ans=((a+b)/10);
+          return { prompt:`${(a/10).toFixed(1)} + ${(b/10).toFixed(1)}`, answer:ans.toFixed(1) };
+      }
+      const n=pick([20,40,50,60,80,100,200]), p=pick([10,20,25,50]);
+      return { prompt:`${p}% of ${n}`, answer:String(n*p/100) };
+  }},
+  { id:11, name:"Find x", icon:"🔎", input:"keypad", gen(){
+      const x=rnd(2,12);
+      const type=rnd(1,4);
+      if (type===1){ const a=rnd(1,9); return {prompt:`x + ${a} = ${x+a}`, answer:String(x)}; }
+      if (type===2){ const a=rnd(1,9); return {prompt:`x − ${a} = ${x-a}`, answer:String(x)}; }
+      if (type===3){ const a=rnd(2,6); return {prompt:`${a}x = ${a*x}`, answer:String(x)}; }
+      const a=rnd(2,6); return {prompt:`x ÷ ${a} = ${x}`, answer:String(x*a)};
+  }},
+  { id:12, name:"Word problems", icon:"🧩", input:"keypad", gen(){
+      const t = rnd(1,4);
+      if (t===1){ const a=rnd(12,40), b=rnd(12,40); return {prompt:`Ravi has ${a} mangoes\nand buys ${b} more.\nHow many now?`, answer:String(a+b)}; }
+      if (t===2){ const a=rnd(3,9), b=rnd(4,9); return {prompt:`A box holds ${a} chocolates.\nHow many in ${b} boxes?`, answer:String(a*b)}; }
+      if (t===3){ const a=rnd(40,99), b=rnd(10,39); return {prompt:`You have ₹${a} and\nspend ₹${b}. Left?`, answer:String(a-b)}; }
+      const b=rnd(3,9), q=rnd(3,9); return {prompt:`Share ${b*q} sweets\nequally among ${b}\nchildren. Each gets?`, answer:String(q)};
+  }},
+];
+
+const QUESTIONS_PER_LEVEL = 10;
+const PASS_RATIO = 0.8;           // 8/10 to pass
+const STORE_KEY = "mathlevels.progress.v1";
+
+/* ---------- progress ---------- */
+function loadProgress(){
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || { unlocked:1, stars:{}, best:{} }; }
+  catch(e){ return { unlocked:1, stars:{}, best:{} }; }
+}
+function saveProgress(p){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(p)); }catch(e){} }
+let progress = loadProgress();
+
+/* ---------- DOM ---------- */
+const $ = (id) => document.getElementById(id);
+const screens = { home:$("home"), quiz:$("quiz"), result:$("result") };
+function show(name){ Object.values(screens).forEach(s=>s.classList.remove("active")); screens[name].classList.add("active"); }
+
+function starString(n){ return "★".repeat(n) + "☆".repeat(3-n); }
+
+function renderHome(){
+  const grid = $("levelGrid");
+  grid.innerHTML = "";
+  LEVELS.forEach(lv => {
+    const unlocked = lv.id <= progress.unlocked;
+    const stars = progress.stars[lv.id] || 0;
+    const el = document.createElement("div");
+    el.className = "lvl" + (unlocked ? "" : " locked");
+    const isNext = (lv.id === progress.unlocked && stars === 0);
+    el.innerHTML = `
+      ${isNext ? '<span class="badge">START</span>' : ''}
+      ${unlocked ? '' : '<span class="lock">🔒</span>'}
+      <div class="num">${lv.id}</div>
+      <div class="nm">${lv.icon} ${lv.name}</div>
+      <div class="stars">${unlocked ? `<span class="on">${"★".repeat(stars)}</span><span class="off">${"☆".repeat(3-stars)}</span>` : ''}</div>`;
+    if (unlocked) el.onclick = () => startLevel(lv.id);
+    grid.appendChild(el);
+  });
+  const done = Object.values(progress.stars).filter(s=>s>0).length;
+  $("homeSub").textContent = done ? `${done}/${LEVELS.length} levels passed · keep going!` : "Pick a level and practise.";
+}
+
+/* ---------- quiz engine ---------- */
+let quiz = null;
+
+function startLevel(levelId){
+  const lv = LEVELS.find(l => l.id === levelId);
+  quiz = { lv, idx:0, score:0, total:QUESTIONS_PER_LEVEL, locked:false, current:null, typed:"" };
+  $("qTitle").textContent = `Level ${lv.id} · ${lv.name}`;
+  show("quiz");
+  nextQuestion();
+}
+
+function nextQuestion(){
+  const lv = quiz.lv;
+  quiz.current = lv.gen();
+  quiz.typed = "";
+  quiz.locked = false;
+
+  $("qCount").textContent = `${quiz.idx+1}/${quiz.total}`;
+  $("progFill").style.width = `${(quiz.idx/quiz.total)*100}%`;
+  $("feedback").textContent = "";
+  const box = $("answerBox"); box.className = "answerbox"; box.textContent = "";
+  const promptEl = $("qPrompt");
+  promptEl.textContent = quiz.current.prompt;
+  promptEl.style.fontSize = quiz.current.prompt.length > 16 ? "24px" : "40px";
+  promptEl.style.whiteSpace = "pre-line";
+
+  if (lv.input === "choice"){
+    box.style.display = "none";
+    $("keypad").style.display = "none";
+    const c = $("choices"); c.style.display = "grid"; c.innerHTML = "";
+    quiz.current.choices.forEach(opt => {
+      const b = document.createElement("button");
+      b.className = "choice"; b.textContent = opt;
+      b.onclick = () => answer(opt, b);
+      c.appendChild(b);
+    });
+  } else {
+    box.style.display = "inline-block";
+    $("choices").style.display = "none";
+    renderKeypad();
+  }
+}
+
+function renderKeypad(){
+  const kp = $("keypad"); kp.style.display = "grid"; kp.innerHTML = "";
+  const keys = ["1","2","3","4","5","6","7","8","9",".","0","⌫"];
+  keys.forEach(k => {
+    const b = document.createElement("button");
+    b.className = "key"; b.textContent = k;
+    b.onclick = () => pressKey(k);
+    kp.appendChild(b);
+  });
+  const go = document.createElement("button");
+  go.className = "key go wide"; go.id = "goBtn"; go.textContent = "Check";
+  go.style.gridColumn = "span 3";
+  go.onclick = () => { if(!quiz.locked) answer(quiz.typed); };
+  kp.appendChild(go);
+  $("answerBox").textContent = quiz.typed || "…";
+}
+
+function pressKey(k){
+  if (quiz.locked) return;
+  if (k === "⌫") quiz.typed = quiz.typed.slice(0,-1);
+  else if (k === "." && quiz.typed.includes(".")) return;
+  else if (quiz.typed.length < 7) quiz.typed += k;
+  $("answerBox").textContent = quiz.typed || "…";
+}
+
+function answer(value, btnEl){
+  if (quiz.locked) return;
+  quiz.locked = true;
+  const correct = quiz.current.answer;
+  const isRight = String(value).trim() === String(correct).trim();
+
+  if (quiz.lv.input === "choice"){
+    const btns = [...document.querySelectorAll(".choice")];
+    btns.forEach(b => { b.onclick = null; if (b.textContent === correct) b.classList.add("ok"); });
+    if (!isRight && btnEl) btnEl.classList.add("no");
+  } else {
+    const box = $("answerBox");
+    box.className = "answerbox " + (isRight ? "ok" : "no");
+    box.textContent = isRight ? value : `${value || "—"} → ${correct}`;
+    $("goBtn").disabled = true;
+  }
+
+  if (isRight){ quiz.score++; $("feedback").textContent = "Correct! ✓"; $("feedback").style.color = "var(--good)"; }
+  else { $("feedback").textContent = `Answer: ${correct}`; $("feedback").style.color = "var(--bad)"; }
+
+  setTimeout(() => {
+    quiz.idx++;
+    if (quiz.idx >= quiz.total) finishLevel();
+    else nextQuestion();
+  }, isRight ? 750 : 1500);
+}
+
+function finishLevel(){
+  $("progFill").style.width = "100%";
+  const lv = quiz.lv, score = quiz.score, total = quiz.total;
+  const passed = score / total >= PASS_RATIO;
+  const stars = score === total ? 3 : (score/total >= 0.9 ? 2 : (passed ? 1 : 0));
+
+  const p = progress;
+  p.best[lv.id] = Math.max(p.best[lv.id] || 0, score);
+  p.stars[lv.id] = Math.max(p.stars[lv.id] || 0, stars);
+  if (passed && lv.id === p.unlocked && lv.id < LEVELS.length) p.unlocked = lv.id + 1;
+  if (passed && lv.id === p.unlocked && lv.id === LEVELS.length) { /* all done */ }
+  saveProgress(p); progress = p;
+
+  $("rScore").textContent = `${score}/${total}`;
+  $("rStars").textContent = starString(stars);
+  $("rMsg").textContent = passed ? (stars===3 ? "Perfect! 🎉" : "Level passed!") : "Almost — try again";
+  $("rDetail").textContent = passed
+      ? (lv.id < LEVELS.length ? `Level ${lv.id+1} unlocked.` : "You finished every level!")
+      : `You need ${Math.ceil(PASS_RATIO*total)}/${total} to pass.`;
+  const nextBtn = $("nextBtn");
+  const hasNext = lv.id < LEVELS.length && passed;
+  nextBtn.style.display = hasNext ? "" : "none";
+  nextBtn.onclick = () => startLevel(lv.id + 1);
+  show("result");
+}
+
+/* ---------- wire up ---------- */
+$("backBtn").onclick = () => { renderHome(); show("home"); };
+$("retryBtn").onclick = () => startLevel(quiz.lv.id);
+$("resetBtn").onclick = () => {
+  if (confirm("Erase all progress and start over?")){
+    progress = { unlocked:1, stars:{}, best:{} };
+    saveProgress(progress); renderHome();
+  }
+};
+document.addEventListener("keydown", (e) => {
+  if (!screens.quiz.classList.contains("active") || !quiz || quiz.locked) return;
+  if (quiz.lv.input !== "keypad") return;
+  if (/^[0-9.]$/.test(e.key)) pressKey(e.key);
+  else if (e.key === "Backspace") pressKey("⌫");
+  else if (e.key === "Enter") answer(quiz.typed);
+});
+
+renderHome();
+
+/* ---------- PWA service worker ---------- */
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>
