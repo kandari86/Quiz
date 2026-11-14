@@ -51,7 +51,7 @@ PUT IT ON YOUR iPHONE (free, no Mac needed)
 UPDATING AN ALREADY-INSTALLED APP
   Re-upload the changed files (Add file -> Upload files -> Commit). If the
   phone still shows the old version, open sw.js and bump the cache name
-  (for example, "mathlevels-v5" -> "mathlevels-v6"), re-upload, and reopen the app.
+  (for example, "mathlevels-v6" -> "mathlevels-v7"), re-upload, and reopen the app.
 
 MAKE IT YOURS
   - Colours: edit the :root values at the top of index.html
