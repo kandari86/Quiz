@@ -12,7 +12,7 @@
 <title>Math Levels</title>
 <style>
   :root{
-    --bg1:#eef2ff; --bg2:#faf5ff; --ink:#1e1b4b; --muted:#6b7280;
+    --bg1:#f0f3ff; --bg2:#fff5fb; --ink:#1e1b4b; --muted:#6b7280;
     --brand:#4f46e5; --brand2:#7c3aed; --good:#16a34a; --bad:#dc2626;
     --card:#ffffff; --line:#e5e7eb; --gold:#f59e0b;
   }
@@ -21,7 +21,10 @@
   body{
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     color:var(--ink);
-    background:linear-gradient(160deg,var(--bg1),var(--bg2));
+    background:
+      radial-gradient(ellipse at 8% 8%,rgba(129,140,248,.19),transparent 30%),
+      radial-gradient(ellipse at 94% 28%,rgba(244,114,182,.13),transparent 28%),
+      linear-gradient(160deg,var(--bg1),var(--bg2));
     min-height:100vh; min-height:100dvh;
     display:flex; justify-content:center;
     padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom);
@@ -32,32 +35,60 @@
   .screen.active{display:flex;}
   @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
 
-  header.top{display:flex; align-items:center; gap:12px; margin:6px 0 16px;}
-  header.top h1{font-size:24px; margin:0; letter-spacing:-.02em;}
-  .sub{color:var(--muted); font-size:13px; margin:2px 0 0;}
+  header.top{display:flex; align-items:center; gap:12px; margin:6px 0 14px;}
+  header.top h1{font-size:23px; margin:0; letter-spacing:-.035em;}
+  .brandmark{width:42px;height:42px;display:grid;place-items:center;border-radius:15px;
+    color:#fff;font-size:23px;background:linear-gradient(145deg,#6366f1,#9333ea);
+    box-shadow:0 7px 16px rgba(79,70,229,.25);transform:rotate(-5deg);}
+  .sub{color:var(--muted); font-size:13px; margin:3px 0 0;}
 
-  .levels{display:grid; grid-template-columns:repeat(3,1fr); gap:12px;}
+  .hero{position:relative;display:flex;align-items:center;justify-content:space-between;gap:4px;
+    min-height:156px;overflow:hidden;padding:18px 14px 16px 19px;margin-bottom:16px;
+    color:#fff;border-radius:25px;background:linear-gradient(115deg,#5148e5 0%,#7854e9 56%,#a148ca 100%);
+    box-shadow:0 12px 26px rgba(91,74,210,.22);}
+  .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;pointer-events:none;}
+  .hero:before{width:160px;height:160px;right:-40px;top:-75px;background:rgba(255,255,255,.09);}
+  .hero:after{width:110px;height:110px;right:20px;bottom:-76px;background:rgba(255,255,255,.08);}
+  .hero-copy{position:relative;z-index:1;max-width:230px;}
+  .hero-kicker{display:block;font-size:9px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;
+    color:#dcd9ff;margin-bottom:7px;}
+  .hero h2{font-size:22px;line-height:1.08;letter-spacing:-.04em;margin:0;}
+  .hero-copy p{font-size:12px;line-height:1.4;color:#eceaff;margin:7px 0 0;}
+  .hero-progress{margin-top:13px;}
+  .hero-progress-label{font-size:10px;font-weight:700;color:#f1efff;display:flex;justify-content:space-between;margin-bottom:5px;}
+  .hero-track{height:5px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden;}
+  .hero-track span{display:block;height:100%;width:0;border-radius:inherit;background:#fcd34d;transition:width .35s ease;}
+  .hero-art{position:relative;z-index:1;width:145px;max-width:44%;height:auto;flex:0 0 auto;
+    filter:drop-shadow(0 8px 8px rgba(34,24,112,.2));animation:float 3.8s ease-in-out infinite;}
+  @keyframes float{0%,100%{transform:translateY(0) rotate(1deg)}50%{transform:translateY(-5px) rotate(-1deg)}}
+
+  .levels{display:grid; grid-template-columns:repeat(3,1fr); gap:11px;}
   .lvl{
-    position:relative; background:var(--card); border:1px solid var(--line);
-    border-radius:18px; padding:14px 8px 10px; text-align:center;
-    box-shadow:0 1px 2px rgba(30,27,75,.05); cursor:pointer;
-    transition:transform .12s ease, box-shadow .12s ease;
+    position:relative; background:rgba(255,255,255,.88); border:1px solid rgba(226,228,242,.9);
+    border-radius:19px; padding:11px 8px 10px; text-align:center; min-width:0;
+    box-shadow:0 4px 12px rgba(30,27,75,.045); cursor:pointer;
+    transition:transform .16s ease, box-shadow .16s ease, border-color .16s ease;
   }
-  .lvl:active{transform:scale(.96);}
-  .lvl .num{font-size:22px; font-weight:800; line-height:1;}
-  .lvl .nm{font-size:11px; color:var(--muted); margin-top:5px; min-height:26px; line-height:1.25;}
-  .lvl .stars{font-size:12px; margin-top:4px; letter-spacing:1px; height:16px;}
-  .lvl.locked{opacity:.5; cursor:not-allowed; background:#f3f4f6;}
+  .lvl:not(.locked):hover{transform:translateY(-3px);box-shadow:0 9px 18px rgba(65,57,160,.12);border-color:#c7c5ff;}
+  .lvl.is-next{border-color:#aaa7ff;box-shadow:0 5px 15px rgba(79,70,229,.13);}
+  .lvl:active{transform:scale(.97);}
+  .lvlhead{display:flex;align-items:center;justify-content:space-between;gap:4px;margin-bottom:7px;}
+  .lvl .num{font-size:12px;font-weight:800;line-height:1;color:#7774b7;background:#f1f0ff;border-radius:8px;padding:5px 6px;}
+  .lvlIcon{width:34px;height:34px;display:grid;place-items:center;border-radius:12px;
+    font-size:20px;background:linear-gradient(145deg,#f1efff,#fff1f7);}
+  .lvl .nm{font-size:11px; font-weight:700; color:#45436c; margin-top:0; min-height:26px; line-height:1.2;}
+  .lvl .stars{font-size:11px; margin-top:4px; letter-spacing:1px; height:15px;}
+  .lvl.locked{opacity:.56; cursor:not-allowed; background:rgba(245,245,249,.85);}
   .lvl.locked:active{transform:none;}
-  .lvl .lock{position:absolute; top:8px; right:9px; font-size:13px; opacity:.6;}
+  .lvl .lock{position:absolute;top:7px;right:7px;font-size:10px;opacity:.8;background:#fff;border-radius:50%;padding:3px;}
   .lvl .badge{position:absolute; top:-7px; left:-7px; background:var(--brand); color:#fff;
     font-size:10px; font-weight:700; padding:2px 7px; border-radius:999px; box-shadow:0 2px 6px rgba(79,70,229,.4);}
-  .lvl.adv .num{color:var(--brand2);}
-  .lvl.adv .nm{color:#7c3aed;}
+  .lvl.adv .num{color:var(--brand2);background:#f5eefe;}
+  .lvl.adv .lvlIcon{background:linear-gradient(145deg,#f5eafe,#ffeaf2);}
   .stars .on{color:var(--gold);} .stars .off{color:#d1d5db;}
 
   .setting{display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto;
-    background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 14px;
+    background:rgba(255,255,255,.88); border:1px solid var(--line); border-radius:16px; padding:12px 14px;
     font-size:13px; font-weight:600;}
   .setting small{display:block; font-weight:400; color:var(--muted); font-size:11px; margin-top:2px;}
   .toggle{border:none; border-radius:999px; padding:8px 18px; font-weight:700; font-size:13px;
@@ -68,8 +99,9 @@
 
   /* Quiz */
   .quizbar{display:flex; align-items:center; gap:10px; margin:4px 0 8px;}
-  .back{background:none;border:none;font-size:22px;color:var(--brand);cursor:pointer;padding:4px 6px;}
-  .progwrap{flex:1; height:10px; background:#e5e7eb; border-radius:999px; overflow:hidden;}
+  .back{width:36px;height:36px;display:grid;place-items:center;background:rgba(255,255,255,.8);border:1px solid var(--line);
+    border-radius:13px;font-size:23px;color:var(--brand);cursor:pointer;padding:0;box-shadow:0 3px 8px rgba(30,27,75,.05);}
+  .progwrap{flex:1; height:11px; background:#e5e7eb; border-radius:999px; overflow:hidden;}
   .progfill{height:100%; width:0; background:linear-gradient(90deg,var(--brand),var(--brand2)); transition:width .3s ease;}
   .qcount{font-size:12px; color:var(--muted); min-width:44px; text-align:right;}
   .timerbar{display:flex; align-items:center; gap:10px; margin:0 0 10px;}
@@ -77,8 +109,9 @@
   .timerfill{height:100%; width:100%; background:var(--brand); transition:width .1s linear, background .3s ease;}
   .timerlabel{font-size:12px; color:var(--muted); min-width:54px; text-align:right; font-variant-numeric:tabular-nums;}
 
-  .qcard{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:22px 18px;
-    margin:10px 0; text-align:center; box-shadow:0 4px 16px rgba(30,27,75,.06); flex:0 0 auto;}
+  .qcard{position:relative;overflow:hidden;background:rgba(255,255,255,.96);border:1px solid #e8e7f5;border-radius:24px;padding:25px 18px;
+    margin:10px 0;text-align:center;box-shadow:0 10px 25px rgba(30,27,75,.08);flex:0 0 auto;}
+  .qcard:before{content:"";position:absolute;top:0;left:0;right:0;height:5px;background:linear-gradient(90deg,#6366f1,#c084fc,#f472b6);}
   .qtitle{font-size:13px; color:var(--muted); margin-bottom:8px;}
   .qprompt{font-size:40px; font-weight:800; letter-spacing:-.02em; line-height:1.25; word-break:break-word;}
   .answerbox{font-size:38px; font-weight:800; min-height:50px; margin-top:12px;
@@ -95,16 +128,17 @@
   .explain .ans{font-weight:800; color:#92400e;}
 
   .choices{display:grid; grid-template-columns:1fr 1fr; gap:12px; margin:6px 0 10px;}
-  .choice{padding:16px 10px; font-size:20px; font-weight:700; background:var(--card);
-    border:1px solid var(--line); border-radius:16px; cursor:pointer; transition:transform .1s ease;
+  .choice{padding:16px 10px; font-size:20px; font-weight:700; background:rgba(255,255,255,.94);
+    border:1px solid var(--line); border-radius:18px; cursor:pointer; transition:transform .12s ease, border-color .12s ease, box-shadow .12s ease;
     word-break:break-word; line-height:1.25;}
+  .choice:hover{transform:translateY(-2px);border-color:#a5a2f5;box-shadow:0 5px 12px rgba(79,70,229,.1);}
   .choice:active{transform:scale(.97);}
   .choice.ok{background:#dcfce7; border-color:var(--good); color:var(--good);}
   .choice.no{background:#fee2e2; border-color:var(--bad); color:var(--bad);}
 
   .keypad{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:auto;}
-  .key{padding:16px 0; font-size:24px; font-weight:700; background:var(--card);
-    border:1px solid var(--line); border-radius:16px; cursor:pointer; transition:transform .08s ease;}
+  .key{padding:16px 0; font-size:24px; font-weight:700; background:rgba(255,255,255,.92);
+    border:1px solid var(--line); border-radius:17px; cursor:pointer; transition:transform .08s ease,background .12s ease;}
   .key:active{transform:scale(.95); background:#eef2ff;}
   .key.wide{grid-column:span 1; font-size:18px;}
   .key.go{background:var(--brand); color:#fff; border-color:var(--brand);}
@@ -116,9 +150,16 @@
   .qnext:active{transform:scale(.98);}
 
   /* Result */
-  .result{align-items:center; text-align:center; justify-content:center; gap:6px;}
+  .result{align-items:center; text-align:center; justify-content:center; gap:6px;position:relative;}
+  .result:before{content:"";position:absolute;width:270px;height:270px;border-radius:50%;top:50%;left:50%;
+    transform:translate(-50%,-58%);background:radial-gradient(circle,#fff 0%,rgba(255,255,255,.7) 58%,transparent 70%);pointer-events:none;}
+  .result>*{position:relative;}
+  .result .trophy{font-size:54px;line-height:1;margin-bottom:4px;filter:drop-shadow(0 7px 5px rgba(180,120,0,.2));animation:bounce .8s cubic-bezier(.2,.8,.3,1.3) both;}
+  @keyframes bounce{from{transform:translateY(-18px) scale(.7);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+  .result.perfect .rstars{animation:star-pop .6s .15s cubic-bezier(.2,.8,.3,1.4) both;}
+  @keyframes star-pop{from{transform:scale(.6);opacity:.5}to{transform:scale(1);opacity:1}}
   .result .big{font-size:64px; font-weight:900; letter-spacing:-.03em;}
-  .result .rstars{font-size:44px; letter-spacing:6px; margin:6px 0;}
+  .result .rstars{font-size:44px; letter-spacing:6px; margin:6px 0;color:#f5a900;text-shadow:0 3px 0 rgba(245,158,11,.12);}
   .result .msg{font-size:17px; font-weight:700; margin-top:6px;}
   .result .detail{color:var(--muted); margin-top:4px; font-size:14px;}
   .btnrow{display:flex; gap:12px; margin-top:26px; width:100%; max-width:340px;}
@@ -126,6 +167,12 @@
   .btn.primary{background:var(--brand); color:#fff;}
   .btn.ghost{background:#fff; border:1px solid var(--line); color:var(--ink);}
   .btn:active{transform:scale(.98);}
+  button:focus-visible,.lvl:focus-visible{outline:3px solid #a5b4fc;outline-offset:3px;}
+  .confetti{position:fixed;z-index:5;top:-14px;width:9px;height:14px;border-radius:3px;pointer-events:none;
+    animation:confetti-fall 1.65s ease-in forwards;}
+  @keyframes confetti-fall{to{transform:translate3d(var(--drift),105vh,0) rotate(var(--spin));opacity:.15}}
+  @media(max-width:360px){#app{padding-left:12px;padding-right:12px}.levels{gap:8px}.lvl{padding-left:5px;padding-right:5px}.hero{padding-left:15px}.hero h2{font-size:20px}.hero-art{width:125px}}
+  @media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;}}
 </style>
 </head>
 <body>
@@ -134,11 +181,44 @@
   <!-- HOME -->
   <section id="home" class="screen active">
     <header class="top">
+      <div class="brandmark" aria-hidden="true">✦</div>
       <div>
         <h1>Math Levels</h1>
         <p class="sub" id="homeSub">Pick a level and practise.</p>
       </div>
     </header>
+    <div class="hero">
+      <div class="hero-copy">
+        <span class="hero-kicker">Your math adventure</span>
+        <h2>Ready, set,<br />solve!</h2>
+        <p>Every question gets you one step closer to superstar status.</p>
+        <div class="hero-progress">
+          <div class="hero-progress-label"><span id="homeProgress">0 of 16 levels complete</span><span>⭐</span></div>
+          <div class="hero-track"><span id="homeProgressFill"></span></div>
+        </div>
+      </div>
+      <svg class="hero-art" viewBox="0 0 180 160" aria-hidden="true">
+        <circle cx="91" cy="82" r="73" fill="#fff" opacity=".13"/>
+        <path d="M27 45l3 7 7 3-7 3-3 7-3-7-7-3 7-3z" fill="#fde68a"/>
+        <path d="M148 32l2.5 5.5L156 40l-5.5 2.5L148 48l-2.5-5.5L140 40l5.5-2.5z" fill="#fbcfe8"/>
+        <circle cx="146" cy="113" r="4" fill="#a5f3fc"/>
+        <path d="M89 43V31" stroke="#fff" stroke-width="5" stroke-linecap="round"/>
+        <circle cx="89" cy="26" r="7" fill="#fcd34d"/>
+        <rect x="44" y="43" width="91" height="76" rx="27" fill="#fff"/>
+        <rect x="36" y="68" width="12" height="25" rx="6" fill="#c4b5fd"/>
+        <rect x="131" y="68" width="12" height="25" rx="6" fill="#c4b5fd"/>
+        <ellipse cx="70" cy="76" rx="5" ry="7" fill="#4f46e5"/>
+        <ellipse cx="109" cy="76" rx="5" ry="7" fill="#4f46e5"/>
+        <circle cx="59" cy="91" r="5" fill="#fbcfe8"/>
+        <circle cx="120" cy="91" r="5" fill="#fbcfe8"/>
+        <path d="M78 94q11 12 22 0" fill="none" stroke="#7c3aed" stroke-width="4" stroke-linecap="round"/>
+        <path d="M53 119v8m73-8v8" stroke="#fff" stroke-width="7" stroke-linecap="round"/>
+        <rect x="63" y="127" width="18" height="7" rx="3.5" fill="#fcd34d"/>
+        <rect x="99" y="127" width="18" height="7" rx="3.5" fill="#a5f3fc"/>
+        <circle cx="28" cy="111" r="12" fill="#fb7185"/><path d="M28 105v12m-6-6h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="151" cy="70" r="11" fill="#34d399"/><path d="M145 70h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
     <div class="levels" id="levelGrid"></div>
     <div class="setting">
       <span>⏱ Timer<small>A time limit per question, longer as levels get harder.</small></span>
@@ -172,6 +252,7 @@
 
   <!-- RESULT -->
   <section id="result" class="screen result">
+    <div class="trophy" id="rTrophy" aria-hidden="true">🏆</div>
     <div class="big" id="rScore">8/10</div>
     <div class="rstars" id="rStars">★★★</div>
     <div class="msg" id="rMsg">Great job!</div>
@@ -723,6 +804,21 @@ function show(name){ Object.values(screens).forEach(s=>s.classList.remove("activ
 
 function starString(n){ return "★".repeat(n) + "☆".repeat(3-n); }
 
+function celebrate(){
+  const colors = ["#fbbf24", "#fb7185", "#34d399", "#60a5fa", "#c084fc"];
+  for (let i = 0; i < 30; i++){
+    const piece = document.createElement("span");
+    piece.className = "confetti";
+    piece.style.left = rnd(0, 100) + "vw";
+    piece.style.background = colors[i % colors.length];
+    piece.style.setProperty("--drift", rnd(-90, 90) + "px");
+    piece.style.setProperty("--spin", rnd(300, 900) + "deg");
+    piece.style.animationDelay = (Math.random() * .35) + "s";
+    document.body.appendChild(piece);
+    setTimeout(() => piece.remove(), 2200);
+  }
+}
+
 function renderHome(){
   const grid = $("levelGrid");
   grid.innerHTML = "";
@@ -730,19 +826,28 @@ function renderHome(){
     const unlocked = lv.id <= progress.unlocked;
     const stars = progress.stars[lv.id] || 0;
     const el = document.createElement("div");
-    el.className = "lvl" + (unlocked ? "" : " locked") + (lv.id >= 13 ? " adv" : "");
     const isNext = (lv.id === progress.unlocked && stars === 0);
+    el.className = "lvl" + (unlocked ? "" : " locked") + (lv.id >= 13 ? " adv" : "") + (isNext ? " is-next" : "");
+    el.setAttribute("role", "button");
+    el.setAttribute("aria-label", `Level ${lv.id}: ${lv.name}${unlocked ? "" : ", locked"}`);
+    el.setAttribute("aria-disabled", unlocked ? "false" : "true");
+    el.tabIndex = unlocked ? 0 : -1;
     el.innerHTML = `
       ${isNext ? '<span class="badge">START</span>' : ''}
       ${unlocked ? '' : '<span class="lock">🔒</span>'}
-      <div class="num">${lv.id}</div>
-      <div class="nm">${lv.icon} ${lv.name}</div>
+      <div class="lvlhead"><span class="num">${String(lv.id).padStart(2, "0")}</span><span class="lvlIcon">${lv.icon}</span></div>
+      <div class="nm">${lv.name}</div>
       <div class="stars">${unlocked ? `<span class="on">${"★".repeat(stars)}</span><span class="off">${"☆".repeat(3-stars)}</span>` : ''}</div>`;
-    if (unlocked) el.onclick = () => startLevel(lv.id);
+    if (unlocked){
+      el.onclick = () => startLevel(lv.id);
+      el.onkeydown = (e) => { if (e.key === "Enter" || e.key === " "){ e.preventDefault(); startLevel(lv.id); } };
+    }
     grid.appendChild(el);
   });
   const done = Object.values(progress.stars).filter(s=>s>0).length;
   $("homeSub").textContent = done ? `${done}/${LEVELS.length} levels passed · keep going!` : "Pick a level and practise.";
+  $("homeProgress").textContent = `${done} of ${LEVELS.length} levels complete`;
+  $("homeProgressFill").style.width = `${(done / LEVELS.length) * 100}%`;
   updateTimerToggle();
 }
 
@@ -876,6 +981,7 @@ function advance(){
 function finishLevel(){
   stopTimer();
   $("timerBar").style.display = "none";
+  $("result").classList.remove("perfect");
   $("progFill").style.width = "100%";
   const lv = quiz.lv, score = quiz.score, total = quiz.total;
   const passed = score / total >= PASS_RATIO;
@@ -889,6 +995,11 @@ function finishLevel(){
 
   $("rScore").textContent = `${score}/${total}`;
   $("rStars").textContent = starString(stars);
+  $("rTrophy").textContent = passed ? "🏆" : "💪";
+  if (stars === 3){
+    $("result").classList.add("perfect");
+    celebrate();
+  }
   $("rMsg").textContent = passed ? (stars===3 ? "Perfect! 🎉" : "Level passed!") : "Almost — try again";
   $("rDetail").textContent = passed
       ? (lv.id < LEVELS.length ? `Level ${lv.id+1} unlocked.` : "You finished every level!")
