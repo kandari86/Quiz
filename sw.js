@@ -1,5 +1,5 @@
 /* Math Levels — offline service worker */
-const CACHE = "mathlevels-v6";
+const CACHE = "mathlevels-v7";
 const ASSETS = ["./", "./index.html", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", (e) => {

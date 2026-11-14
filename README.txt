@@ -32,6 +32,21 @@ ANSWER + EXPLANATION
   answer AND a short worked solution ("how to solve it"), then waits for
   you to tap Next. Correct answers move on quickly by themselves.
 
+MONSTER BATTLES + OUTFITS
+  Every level has a monster. Correct answers lower its health; wrong
+  answers do not cost lives, and the existing 80% pass mark is unchanged.
+  Pass unique levels to unlock mascot outfits at 4, 8, 12, and 16 wins.
+  Your selected outfit is saved on this device.
+
+TWO-PLAYER DUEL
+  Play on the same device: each player answers the same 10 mixed questions
+  drawn from unlocked levels, then compare scores. The duel does not change
+  normal level progress. The home-screen timer setting applies to duels too.
+
+QUESTION VARIETY
+  A round does not repeat a question; simple early-level arithmetic avoids
+  1 as an operand, and multiplication tables start at 2.
+
 TRY IT ON YOUR PC
   1. Double-click index.html. It opens in your browser.
   2. Play a level to check it works.
@@ -51,7 +66,7 @@ PUT IT ON YOUR iPHONE (free, no Mac needed)
 UPDATING AN ALREADY-INSTALLED APP
   Re-upload the changed files (Add file -> Upload files -> Commit). If the
   phone still shows the old version, open sw.js and bump the cache name
-  (for example, "mathlevels-v6" -> "mathlevels-v7"), re-upload, and reopen the app.
+  (for example, "mathlevels-v7" -> "mathlevels-v8"), re-upload, and reopen the app.
 
 MAKE IT YOURS
   - Colours: edit the :root values at the top of index.html
